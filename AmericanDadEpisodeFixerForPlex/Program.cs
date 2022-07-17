@@ -29,18 +29,19 @@ await using (EpisodeMetaData epfix = new EpisodeMetaData
     };
     if(await efr.PullFilesAndNames())
     {
+        Console.WriteLine($"Got Episodes from {efr.SeriesFolder}");
         if (await processedSucessfully)
         {
-
+            efr.SortEpisodesBasedonMetaData(epfix);
         }
         else
         {
-            Console.WriteLine("Could not process episode data");
+            Console.WriteLine("Could not process episode metadata");
         }
     }
     else
     {
-        Console.WriteLine("Couple Not Process all the episodes");
+        Console.WriteLine($"Couple Not Process all the episodes from {efr.SeriesFolder}");
     }
     
 }

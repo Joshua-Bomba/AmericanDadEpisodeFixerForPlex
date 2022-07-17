@@ -8,90 +8,6 @@ using System.Threading.Tasks;
 namespace AmericanDadEpisodeFixerForPlex
 {
 
-    public class EpisodeFile : BaseEpisode
-    {
-        public const string FIND_SEASON = "(?<=(s(eason)? ?))\\d{1,2}";
-        public const string FIND_EPISODE = "(?<=(e(pisode)? ?))\\d{1,2}";
-
-        public FileInfo FileInfo { get; set; }
-
-
-        private bool ProcessSeasonAndEpisode(string season, string episode)
-        {
-            bool seasonValid = !string.IsNullOrWhiteSpace(season);
-            bool episodeValid = !string.IsNullOrWhiteSpace(episode);
-            if(EpisodeNumber == null&& episodeValid)
-            {
-                EpisodeNumber = Convert.ToInt32(episode);
-            }
-            if(Season == null&& seasonValid)
-            {
-                Season = Convert.ToInt32(season);
-            }
-            return seasonValid && episodeValid;
-        }
-
-        public bool EstimateEpisode(string baseDir)
-        {
-            string name = FileInfo.FullName;
-            string season;
-            string episode;
-            string fName;
-            bool valid = false;
-            try
-            {
-
-                name = name.Replace(baseDir, string.Empty);
-                season = Regex.Match(name, FIND_SEASON, RegexOptions.IgnoreCase).Value;
-                episode = Regex.Match(name, FIND_EPISODE, RegexOptions.IgnoreCase).Value;
-
-                valid = ProcessSeasonAndEpisode(season, episode);
-
-                if (Season != null && EpisodeNumber == null)
-                {
-                    fName = FileInfo.Name;
-                    episode = Regex.Match(fName, "(?<="+ Season.Value +") ?\\d{1,2}").Value;
-                    valid = ProcessSeasonAndEpisode(season,episode);
-                    if(EpisodeNumber == null)
-                    {
-                        episode = Regex.Match(fName, "\\d{1,2}").Value;
-                    }
-                    valid = ProcessSeasonAndEpisode(season, episode);
-                }
-                else if(season == null && EpisodeNumber == null)
-                {
-                    //did not run into this scenerio
-                }
-
-            }
-            catch
-            {
-                return false;
-            }
-            return valid;
-        }
-
-    }
-
-    public class Episodes : List<EpisodeFile>
-    {
-        private DirectoryInfo _dir;
-        public Episodes(DirectoryInfo dir)
-        {
-            _dir = dir;
-        }
-
-        public bool ProcessEpisodes()
-        {
-            string dir = _dir.FullName;
-            foreach (EpisodeFile episode in this)
-                if (!episode.EstimateEpisode(dir))
-                    return false;
-            return true;
-        }
-    }
-
-
     public class EpisodeFileResolver
     {
         private Episodes episodes;
@@ -107,7 +23,7 @@ namespace AmericanDadEpisodeFixerForPlex
 
 
 
-        public void GetAllFiles(DirectoryInfo di, Episodes episodes)
+        private void GetAllFiles(DirectoryInfo di, Episodes episodes)
         {
             foreach (FileInfo file in di.GetFiles())
                 if(IncludedExtensions.Contains(file.Extension.TrimStart('.').ToUpper()))
@@ -137,6 +53,83 @@ namespace AmericanDadEpisodeFixerForPlex
         }
 
 
+        private Dictionary<int,List<EpisodeFile>> GetEpisodesForEachSeason()
+        {
+            return episodes.GroupBy(x => x.Season.Value).ToDictionary(x => x.Key, y => y.ToList());
+        }
 
+        private List<EpisodeFile> ProcessEpisodes(Dictionary<int, Episode> propertySeasonOrder,List<EpisodeFile> myEpisodes,int offset)
+        {
+            List<EpisodeFile> overFlow = new List<EpisodeFile>();
+            foreach (EpisodeFile episode in myEpisodes)
+            {
+                if(!AssociateEpisode(propertySeasonOrder,episode.EpisodeNumber.Value - offset,episode))
+                {
+                    overFlow.Add(episode);
+                }
+            }
+            return overFlow;
+        }
+
+        private bool AssociateEpisode(Dictionary<int, Episode> propertySeasonOrder,int episodeNumber,EpisodeFile myEpisode)
+        {
+            if (propertySeasonOrder.ContainsKey(episodeNumber))
+            {
+                myEpisode.AssociatedEpisode = propertySeasonOrder[episodeNumber];
+                propertySeasonOrder.Remove(episodeNumber);
+                return true;
+            }
+            return false;
+        }
+
+        public void SortEpisodesBasedonMetaData(EpisodeMetaData emd)
+        {
+            Dictionary<int, Dictionary<int, Episode>> properOrder  = emd.GetEpisodesForEachSeason();
+
+            Dictionary<int, List<EpisodeFile>> myOrder = this.GetEpisodesForEachSeason();
+
+            int min = myOrder.Keys.Min();
+            int max = myOrder.Keys.Max();
+
+
+
+            List<EpisodeFile>? nextSeasonFlowOver = null;
+            int lastSeasonHighestEpisode = 0;
+            for (int i = min;i <= max;i++)
+            {
+                List<EpisodeFile> myEpisodes = myOrder[i];
+                Dictionary<int, Episode> propertySeasonOrder = properOrder[i];
+                int offSet = 0;
+                if(nextSeasonFlowOver != null&&nextSeasonFlowOver.Any())
+                {
+                    foreach (EpisodeFile ef in nextSeasonFlowOver)
+                    {
+                        int num = ef.EpisodeNumber.Value - lastSeasonHighestEpisode;
+                        if (offSet < num)
+                            offSet = num;
+
+                        if (!AssociateEpisode(propertySeasonOrder, num, ef))
+                        {
+                            throw new DataMisalignedException();
+                        }
+                    }
+                    nextSeasonFlowOver = null;
+                }
+
+                lastSeasonHighestEpisode = propertySeasonOrder.Max(x => x.Key);
+                nextSeasonFlowOver = ProcessEpisodes(propertySeasonOrder, myEpisodes, offSet);
+
+                if (propertySeasonOrder.Any())
+                {
+                    Console.Write("Could Not Find Episodes: ");
+                    foreach(Episode episode in propertySeasonOrder.Values)
+                    {
+                        Console.Write(episode.CombinedEpisodeAndSeason());
+                        Console.Write(" ");
+                    }
+                    Console.WriteLine();
+                }
+            }
+        }
     }
 }

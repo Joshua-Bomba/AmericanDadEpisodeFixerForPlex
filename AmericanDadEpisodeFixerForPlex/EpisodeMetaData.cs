@@ -194,6 +194,10 @@ namespace AmericanDadEpisodeFixerForPlex
                 return true;
             }
         }
+        public Dictionary<int,Dictionary<int,Episode>> GetEpisodesForEachSeason()
+        {
+            return _episodes.Values.GroupBy(x => x.Season.Value).ToDictionary(x=>x.Key,y=>y.ToDictionary(z=>z.EpisodeNumber.Value,zz=>zz));
+        }
 
         public async ValueTask DisposeAsync()
         {
