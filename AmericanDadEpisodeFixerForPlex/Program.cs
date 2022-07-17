@@ -11,17 +11,21 @@ IConfiguration config = builder.Build();
 
 
 
-EpisodeFixer epfix = new EpisodeFixer 
-{ 
-    EpisodeDataEndpoint = config["EpisodeList"] 
-};
-
-bool processedSucessfully = await epfix.ProcessEpisodeData();
-if(processedSucessfully)
+await using (EpisodeFixer epfix = new EpisodeFixer
 {
-
-}
-else
+    EpisodeDataEndpoint = config["EpisodeList"],
+    CachePage = config["CachePage"]
+})
 {
-    Console.WriteLine("Could not pull episode list data");
+    bool processedSucessfully = await epfix.ProcessEpisodeData();
+    if (processedSucessfully)
+    {
+
+    }
+    else
+    {
+        Console.WriteLine("Could not process episode data");
+    }
 }
+
+
