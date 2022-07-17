@@ -74,14 +74,14 @@ namespace AmericanDadEpisodeFixerForPlex
     }
 
 
-    public class EpisodeFixer : IAsyncDisposable
+    public class EpisodeMetaData : IAsyncDisposable
     {
         public const string TABLE_MATCH = "<table.*wikiepisodetable.*?>(.|\n)*?(<\\/table>)";
         public static readonly HashSet<string> TABLE_TAGS = new HashSet<string> { "table", "th", "tr", "td","caption","colgroup","col","thread","tbody","tfoot" };
         private HttpClient _client;
         private Stack<Task> _beforeFinish;
         private Dictionary<string, Episode> _episodes;
-        public EpisodeFixer() 
+        public EpisodeMetaData() 
         {
             _episodes =new Dictionary<string, Episode>();
         }
