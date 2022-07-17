@@ -19,7 +19,10 @@ await using (EpisodeMetaData epfix = new EpisodeMetaData
 })
 {
     ValueTask<bool> processedSucessfully = epfix.ProcessEpisodeData();
-    EpisodeFileResolver efr = new EpisodeFileResolver();
+    EpisodeFileResolver efr = new EpisodeFileResolver
+    {
+        SeriesFolder = config["SeriesFolder"]
+    };
     await efr.PullFilesAndNames();
 
 
