@@ -7,13 +7,16 @@ using System.Threading.Tasks;
 
 namespace AmericanDadEpisodeFixerForPlex
 {
-    public class Episode
+    public class BaseEpisode
     {
         public int? Season { get; set; }
         public int? EpisodeNumber { get; set; }
 
         public string CombinedEpisodeAndSeason => string.Format("S{0:00}E{1:00}", Season, EpisodeNumber);
+    }
 
+    public class Episode : BaseEpisode
+    {
         public string? EpisodeName { get; set; }
 
         public DateTime? AirDate { get; set; }
