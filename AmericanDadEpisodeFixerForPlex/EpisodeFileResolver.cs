@@ -58,7 +58,7 @@ namespace AmericanDadEpisodeFixerForPlex
                 }
                 else if(season == null && EpisodeNumber == null)
                 {
-
+                    //did not run into this scenerio
                 }
             }
             catch
@@ -68,6 +68,22 @@ namespace AmericanDadEpisodeFixerForPlex
             
         }
 
+    }
+
+    public class Episodes : List<EpisodeFile>
+    {
+        private DirectoryInfo _dir;
+        public Episodes(DirectoryInfo dir)
+        {
+            _dir = dir;
+        }
+
+        public void ProcessEpisodes()
+        {
+            string dir = _dir.FullName;
+            foreach (EpisodeFile episode in this)
+                episode.EstimateEpisode(dir);
+        }
     }
 
 
@@ -85,14 +101,16 @@ namespace AmericanDadEpisodeFixerForPlex
 
 
 
-        public IEnumerable<EpisodeFile> GetAllFiles(DirectoryInfo di)
+        public void GetAllFiles(DirectoryInfo di, Episodes episodes)
         {
             foreach (FileInfo file in di.GetFiles())
                 if(IncludedExtensions.Contains(file.Extension.TrimStart('.').ToUpper()))
-                    yield return new EpisodeFile { FileInfo = file};
+                    episodes.Add(new EpisodeFile { FileInfo = file});
             foreach(DirectoryInfo childDi in di.GetDirectories())
-                foreach(EpisodeFile childFile in GetAllFiles(childDi))
-                    yield return childFile;
+            {
+                GetAllFiles(childDi, episodes);
+            }
+
         }
 
 
@@ -104,13 +122,9 @@ namespace AmericanDadEpisodeFixerForPlex
                 DirectoryInfo di = new DirectoryInfo(SeriesFolder);
                 if(di.Exists)
                 {
-                    EpisodeFile[] files = GetAllFiles(di).ToArray();
-
-                    string fullBaseDirName = di.FullName;
-                    foreach(EpisodeFile file in files)
-                    {
-                        file.EstimateEpisode(fullBaseDirName);
-                    }
+                    Episodes episodes = new Episodes(di);
+                    GetAllFiles(di, episodes);
+                    episodes.ProcessEpisodes();
                 }
             }
             return false;
