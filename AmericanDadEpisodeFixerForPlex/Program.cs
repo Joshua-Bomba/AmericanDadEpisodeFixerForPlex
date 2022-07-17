@@ -27,17 +27,22 @@ await using (EpisodeMetaData epfix = new EpisodeMetaData
         SeriesFolder = config["SeriesFolder"],
         IncludedExtensions = extensions
     };
-    await efr.PullFilesAndNames();
-
-
-    if (await processedSucessfully)
+    if(await efr.PullFilesAndNames())
     {
-        
+        if (await processedSucessfully)
+        {
+
+        }
+        else
+        {
+            Console.WriteLine("Could not process episode data");
+        }
     }
     else
     {
-        Console.WriteLine("Could not process episode data");
+        Console.WriteLine("Couple Not Process all the episodes");
     }
+    
 }
 
 

@@ -16,7 +16,7 @@ namespace AmericanDadEpisodeFixerForPlex
         public FileInfo FileInfo { get; set; }
 
 
-        private void ProcessSeasonAndEpisode(string season, string episode)
+        private bool ProcessSeasonAndEpisode(string season, string episode)
         {
             bool seasonValid = !string.IsNullOrWhiteSpace(season);
             bool episodeValid = !string.IsNullOrWhiteSpace(episode);
@@ -28,14 +28,16 @@ namespace AmericanDadEpisodeFixerForPlex
             {
                 Season = Convert.ToInt32(season);
             }
+            return seasonValid && episodeValid;
         }
 
-        public void EstimateEpisode(string baseDir)
+        public bool EstimateEpisode(string baseDir)
         {
             string name = FileInfo.FullName;
             string season;
             string episode;
             string fName;
+            bool valid = false;
             try
             {
 
@@ -43,29 +45,30 @@ namespace AmericanDadEpisodeFixerForPlex
                 season = Regex.Match(name, FIND_SEASON, RegexOptions.IgnoreCase).Value;
                 episode = Regex.Match(name, FIND_EPISODE, RegexOptions.IgnoreCase).Value;
 
-                ProcessSeasonAndEpisode(season, episode);
+                valid = ProcessSeasonAndEpisode(season, episode);
 
                 if (Season != null && EpisodeNumber == null)
                 {
                     fName = FileInfo.Name;
                     episode = Regex.Match(fName, "(?<="+ Season.Value +") ?\\d{1,2}").Value;
-                    ProcessSeasonAndEpisode(season,episode);
+                    valid = ProcessSeasonAndEpisode(season,episode);
                     if(EpisodeNumber == null)
                     {
                         episode = Regex.Match(fName, "\\d{1,2}").Value;
                     }
-                    ProcessSeasonAndEpisode(season, episode);
+                    valid = ProcessSeasonAndEpisode(season, episode);
                 }
                 else if(season == null && EpisodeNumber == null)
                 {
                     //did not run into this scenerio
                 }
+
             }
             catch
             {
-                throw;
+                return false;
             }
-            
+            return valid;
         }
 
     }
@@ -78,17 +81,20 @@ namespace AmericanDadEpisodeFixerForPlex
             _dir = dir;
         }
 
-        public void ProcessEpisodes()
+        public bool ProcessEpisodes()
         {
             string dir = _dir.FullName;
             foreach (EpisodeFile episode in this)
-                episode.EstimateEpisode(dir);
+                if (!episode.EstimateEpisode(dir))
+                    return false;
+            return true;
         }
     }
 
 
     public class EpisodeFileResolver
     {
+        private Episodes episodes;
         public EpisodeFileResolver() 
         {
         
@@ -122,9 +128,9 @@ namespace AmericanDadEpisodeFixerForPlex
                 DirectoryInfo di = new DirectoryInfo(SeriesFolder);
                 if(di.Exists)
                 {
-                    Episodes episodes = new Episodes(di);
+                    episodes = new Episodes(di);
                     GetAllFiles(di, episodes);
-                    episodes.ProcessEpisodes();
+                    return episodes.ProcessEpisodes();
                 }
             }
             return false;
