@@ -172,7 +172,7 @@ namespace AmericanDadEpisodeFixerForPlex
                     {
                         await foreach (Episode e in ProcessMatch(++season, m.Value))
                         {
-                            _episodes.Add(e.ProductionCode, e);
+                            _episodes.Add(e.CombinedEpisodeAndSeason, e);
                         }
                     }
 

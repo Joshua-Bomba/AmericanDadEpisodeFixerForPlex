@@ -12,6 +12,8 @@ namespace AmericanDadEpisodeFixerForPlex
         public int? Season { get; set; }
         public int? EpisodeNumber { get; set; }
 
+        public string CombinedEpisodeAndSeason => string.Format("S{0:00}E{1:00}", Season, EpisodeNumber);
+
         public string? EpisodeName { get; set; }
 
         public DateTime? AirDate { get; set; }
