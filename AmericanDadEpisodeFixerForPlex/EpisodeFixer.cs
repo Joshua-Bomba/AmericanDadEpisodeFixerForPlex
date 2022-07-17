@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace AmericanDadEpisodeFixerForPlex
 {
     public class EpisodeFixer : IAsyncDisposable
     {
-
+        public const string TABLE_MATCH = "<table.*wikiepisodetable.*?>(.|\n)*?(<\\/table>)";
         private HttpClient _client;
         private Task _beforeFinish;
         public EpisodeFixer() 
@@ -52,6 +53,7 @@ namespace AmericanDadEpisodeFixerForPlex
             string? content = await GetPageData();
             if(!string.IsNullOrWhiteSpace(content))
             {
+                MatchCollection tables= Regex.Matches(content, TABLE_MATCH);
                 //would like to pull from plex since it's better but i'm not sure how there api works
                 //and this is supposto be quick so i'm gonna pull from wikipea and handle it my own way
                 return true;
