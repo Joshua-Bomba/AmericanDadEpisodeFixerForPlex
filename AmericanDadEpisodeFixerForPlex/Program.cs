@@ -9,8 +9,6 @@ var builder = new ConfigurationBuilder()
 IConfiguration config = builder.Build();
 
 
-//would like to pull from plex since it's better but i'm not sure how there api works
-//and this is supposto be quick so i'm gonna pull from wikipea and handle it my own way
 
 
 EpisodeFixer epfix = new EpisodeFixer 
