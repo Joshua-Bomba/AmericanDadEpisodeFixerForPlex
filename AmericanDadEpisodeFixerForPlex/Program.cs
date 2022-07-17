@@ -19,9 +19,13 @@ await using (EpisodeMetaData epfix = new EpisodeMetaData
 })
 {
     ValueTask<bool> processedSucessfully = epfix.ProcessEpisodeData();
+
+    var extensions = config.GetSection("IncludedExtensions").GetChildren().Select(x => x.Value).ToHashSet();
+
     EpisodeFileResolver efr = new EpisodeFileResolver
     {
-        SeriesFolder = config["SeriesFolder"]
+        SeriesFolder = config["SeriesFolder"],
+        IncludedExtensions = extensions
     };
     await efr.PullFilesAndNames();
 

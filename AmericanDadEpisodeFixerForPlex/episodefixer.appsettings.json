@@ -2,5 +2,6 @@
   "EpisodeList": "https://en.wikipedia.org/wiki/List_of_American_Dad!_episodes",
   "CachePage": "cachedpage.html",
   "CachedEpisodes": "cachedepisodes.json",
-  "SeriesFolder":  null
+  "SeriesFolder": null,
+  "IncludedExtensions": [ "MP4", "MOV", "WMV", "AVI", "MKV" ]
 }
