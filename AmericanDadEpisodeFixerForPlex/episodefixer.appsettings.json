@@ -1,5 +1,6 @@
 {
   "EpisodeList": "https://en.wikipedia.org/wiki/List_of_American_Dad!_episodes",
   "CachePage": "cachedpage.html",
-  "CachedEpisodes":  "cachedepisodes.json"
+  "CachedEpisodes": "cachedepisodes.json",
+  "SeriesFolder":  null
 }
