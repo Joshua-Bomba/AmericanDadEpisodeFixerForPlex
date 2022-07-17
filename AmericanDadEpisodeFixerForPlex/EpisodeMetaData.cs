@@ -11,69 +11,7 @@ using System.Xml;
 
 namespace AmericanDadEpisodeFixerForPlex
 {
-    public class Episode
-    {
-        public int? Season { get; set; }
-        public int? EpisodeNumber { get; set; }
-
-        public string? EpisodeName { get; set; }
-
-        public DateTime? AirDate { get; set; }
-
-        public string? ProductionCode { get; set; }
-
-        private string ProcessElementContent(StringBuilder sb)
-        {
-            string res = sb.ToString();
-            res = Regex.Replace(res, "\r|\n|\"", string.Empty);
-            return res;
-        }
-
-        public void ProcessContent(int index, StringBuilder sb)
-        { 
-            string s;
-            try
-            {
-                switch (index)
-                {
-                    case 0:
-                        s = ProcessElementContent(sb);
-                        s = Regex.Match(s, "^\\d*").Value;
-                        EpisodeNumber = Convert.ToInt32(s);
-                        break;
-                    case 1:
-                        s = ProcessElementContent(sb);
-                        EpisodeName = s;
-                        break;
-                    case 4:
-                        s = ProcessElementContent(sb);
-                        s = Regex.Match(s, "(?<=(\\()).+(?=\\))").Value;
-
-                        AirDate = Convert.ToDateTime(s);
-                        break;
-                    case 5:
-                        s = ProcessElementContent(sb);
-                        ProductionCode = s;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            finally
-            {
-                sb.Clear();
-            }
-            
-        }
-
-
-    }
-
-
+   
     public class EpisodeMetaData : IAsyncDisposable
     {
         public const string TABLE_MATCH = "<table.*wikiepisodetable.*?>(.|\n)*?(<\\/table>)";
