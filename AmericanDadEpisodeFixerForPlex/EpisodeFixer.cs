@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -77,15 +79,18 @@ namespace AmericanDadEpisodeFixerForPlex
         public const string TABLE_MATCH = "<table.*wikiepisodetable.*?>(.|\n)*?(<\\/table>)";
         public static readonly HashSet<string> TABLE_TAGS = new HashSet<string> { "table", "th", "tr", "td","caption","colgroup","col","thread","tbody","tfoot" };
         private HttpClient _client;
-        private Task _beforeFinish;
+        private Stack<Task> _beforeFinish;
+        private Dictionary<string, Episode> _episodes;
         public EpisodeFixer() 
         {
-            _client = new HttpClient();
+            _episodes =new Dictionary<string, Episode>();
         }
 
         public string EpisodeDataEndpoint { get; init; }
 
         public string? CachePage { get; init; }
+
+        public string? CachedEpisodes { get; init; }
 
         private async ValueTask<string?> GetPageData()
         {
@@ -93,9 +98,12 @@ namespace AmericanDadEpisodeFixerForPlex
             {
                 if (File.Exists(CachePage))
                 {
+                    Console.WriteLine("Using Cached Page");
                     return await File.ReadAllTextAsync(CachePage);
                 }
             }
+            Console.WriteLine("No Cached Page. Fetching from the web");
+            _client = new HttpClient();
             var response = await _client.GetAsync(EpisodeDataEndpoint);
 
             if (response.IsSuccessStatusCode)
@@ -103,7 +111,9 @@ namespace AmericanDadEpisodeFixerForPlex
                  string content = await response.Content.ReadAsStringAsync();
                 if(CachePage != null)
                 {
-                    _beforeFinish = File.WriteAllTextAsync(CachePage, content);
+                    if (_beforeFinish == null)
+                        _beforeFinish = new Stack<Task>();
+                    _beforeFinish.Push(File.WriteAllTextAsync(CachePage, content));
                 }
                 return content;
             }
@@ -141,7 +151,6 @@ namespace AmericanDadEpisodeFixerForPlex
                         case XmlNodeType.Text:
                             res = await reader.GetValueAsync();
                             elementContent.AppendLine(res);
-                            Console.WriteLine("Text Node: {0}",res );
                             break;
                         case XmlNodeType.EndElement:
                             res = reader.Name;
@@ -173,12 +182,9 @@ namespace AmericanDadEpisodeFixerForPlex
                                 }
                                 element.Pop();
                             }
-                            Console.WriteLine("End Element {0}", res);
                             break;
                         default:
                             res = reader.Value;
-                            Console.WriteLine("Other node {0} with value {1}",
-                                            reader.NodeType, res);
                             break;
                     }
                 }
@@ -186,29 +192,68 @@ namespace AmericanDadEpisodeFixerForPlex
         }
 
 
+        public async ValueTask<bool> CheckForCachedEpisodes()
+        {
+            if(File.Exists(CachedEpisodes))
+            {
+                string content = await File.ReadAllTextAsync(CachedEpisodes);
+                _episodes = JsonConvert.DeserializeObject<Dictionary<string, Episode>>(content);
+                return true;
+            }
+            return false;
+        }
+
+
+        public async Task ExportCachedEpisodes()
+        {
+            await Task.Run(async () =>
+            {
+                string res = JsonConvert.SerializeObject(_episodes, new JsonSerializerSettings{Formatting = Newtonsoft.Json.Formatting.Indented });
+
+                await File.WriteAllTextAsync(CachedEpisodes, res);
+
+
+            });
+        }
+
+
 
         public async ValueTask<bool> ProcessEpisodeData()
         {
-            string? content = await GetPageData();
-            if(!string.IsNullOrWhiteSpace(content))
+            if(!await this.CheckForCachedEpisodes())
             {
-                Dictionary<string,Episode> episodes = new Dictionary<string,Episode>();
-                MatchCollection tables= Regex.Matches(content, TABLE_MATCH);
-                //would like to pull from plex since it's better but i'm not sure how there api works
-                //and this is supposto be quick so i'm gonna pull from wikipea and handle it my own way
-                int season = 0;
-                foreach(Match m in tables)
+                Console.WriteLine("No Cached Episodes Processing from page");
+                string? content = await GetPageData();
+                if (!string.IsNullOrWhiteSpace(content))
                 {
-                    await foreach(Episode e in ProcessMatch(++season, m.Value))
+                    MatchCollection tables = Regex.Matches(content, TABLE_MATCH);
+                    //would like to pull from plex since it's better but i'm not sure how there api works
+                    //and this is supposto be quick so i'm gonna pull from wikipea and handle it my own way
+                    int season = 0;
+                    foreach (Match m in tables)
                     {
-                        episodes.Add(e.ProductionCode, e);
+                        await foreach (Episode e in ProcessMatch(++season, m.Value))
+                        {
+                            _episodes.Add(e.ProductionCode, e);
+                        }
                     }
+
+                    if (CachedEpisodes != null)
+                    {
+                        if (_beforeFinish == null)
+                            _beforeFinish = new Stack<Task>();
+                        _beforeFinish.Push(ExportCachedEpisodes());
+                    }
+                    return true;
                 }
-                return true;
+                else
+                {
+                    return false;
+                }
             }
             else
             {
-                return false;
+                return true;
             }
         }
 
@@ -216,7 +261,8 @@ namespace AmericanDadEpisodeFixerForPlex
         {
             if(_beforeFinish != null)
             {
-                await _beforeFinish;
+                await Task.WhenAll(_beforeFinish);
+                _beforeFinish = null;
             }
         }
     }

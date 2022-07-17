@@ -14,7 +14,8 @@ IConfiguration config = builder.Build();
 await using (EpisodeFixer epfix = new EpisodeFixer
 {
     EpisodeDataEndpoint = config["EpisodeList"],
-    CachePage = config["CachePage"]
+    CachePage = config["CachePage"],
+    CachedEpisodes = config["CachedEpisodes"]
 })
 {
     bool processedSucessfully = await epfix.ProcessEpisodeData();
