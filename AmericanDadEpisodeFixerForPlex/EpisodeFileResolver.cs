@@ -108,7 +108,7 @@ namespace AmericanDadEpisodeFixerForPlex
             //We need to do this in order because will need to overflow episodes from one season to the next
             //hang tight
             List<EpisodeFile>? nextSeasonFlowOver = null;
-            for (int i = min;i <= max;i++)
+            for (int i = min;i <= max || (nextSeasonFlowOver != null &&nextSeasonFlowOver.Any());i++)
             {
                 
                 
@@ -157,10 +157,10 @@ namespace AmericanDadEpisodeFixerForPlex
 
                 foreach (EpisodeFile episode in myEpisodes)
                 {
-                    episode.OverFlowOffSet += seasonStartOffSet;
+                    episode.OverFlowOffSet -= seasonStartOffSet;
                     if (!AssociateEpisode(propertySeasonOrder, episode))
                     {
-                        episode.OverFlowOffSet = currentSeasonLastEpisode;
+                        episode.OverFlowOffSet += currentSeasonLastEpisode;
                         nextSeasonFlowOver.Add(episode);
                     }
                 }
@@ -176,6 +176,21 @@ namespace AmericanDadEpisodeFixerForPlex
                     Console.WriteLine();
                 }
             }
+
+            foreach(var kv in myOrder)
+            {
+                Console.WriteLine($"Processed Season {kv.Key}");
+                foreach(var l in kv.Value)
+                {
+                    if(l != null)
+                    {
+                        Console.WriteLine($"My Episode: {l.CombinedEpisodeAndSeason()} There Episode: {l.AssociatedEpisode.CombinedEpisodeAndSeason()}");
+                    }
+                }
+            }
+
+
+
         }
     }
 }
