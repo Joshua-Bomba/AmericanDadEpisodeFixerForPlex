@@ -87,7 +87,7 @@ namespace AmericanDadEpisodeFixerForPlex
 
         public void CalculateMove(string dir)
         {
-            string fName = string.Format("S{0:00}E{1:00} - {2}.{3}", AssociatedEpisode.Season.Value, AssociatedEpisode.EpisodeNumber, AssociatedEpisode.EpisodeName, FileInfo.Extension);
+            string fName = string.Format("S{0:00}E{1:00} - {2}{3}", AssociatedEpisode.Season.Value, AssociatedEpisode.EpisodeNumber, AssociatedEpisode.EpisodeName, FileInfo.Extension);
             this.NewFile = Path.Combine(dir, $"Season {AssociatedEpisode.Season.Value}",fName);
         }
 
