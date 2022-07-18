@@ -4,14 +4,14 @@ using Microsoft.Extensions.Configuration;
 
 var builder = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("episodefixer.appsettings.json").AddUserSecrets<EpisodeMetaData>();
+    .AddJsonFile("episodefixer.appsettings.json").AddUserSecrets<EpisodeMetaDataHandler>();
 
 IConfiguration config = builder.Build();
 
 
 
 
-await using (EpisodeMetaData epfix = new EpisodeMetaData
+await using (EpisodeMetaDataHandler epfix = new EpisodeMetaDataHandler
 {
     EpisodeDataEndpoint = config["EpisodeList"],
     CachePage = config["CachePage"],
@@ -23,7 +23,7 @@ await using (EpisodeMetaData epfix = new EpisodeMetaData
 
     var extensions = config.GetSection("IncludedExtensions").GetChildren().Select(x => x.Value).ToHashSet();
 
-    EpisodeFileResolver efr = new EpisodeFileResolver
+    EpisodeFileHandler efr = new EpisodeFileHandler
     {
         SeriesFolder = config["SeriesFolder"],
         IncludedExtensions = extensions

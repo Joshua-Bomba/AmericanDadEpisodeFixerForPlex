@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 namespace AmericanDadEpisodeFixerForPlex
 {
 
-    public class EpisodeFileResolver
+    public class EpisodeFileHandler
     {
         private Episodes episodes;
-        public EpisodeFileResolver() 
+        public EpisodeFileHandler() 
         {
         
         }
@@ -58,7 +58,7 @@ namespace AmericanDadEpisodeFixerForPlex
             return episodes.GroupBy(x => x.Season.Value).ToDictionary(x => x.Key, y => y.ToList());
         }
 
-        private bool AssociateEpisode(Dictionary<int, Episode> propertySeasonOrder,EpisodeFile myEpisode)
+        private bool AssociateEpisode(Dictionary<int, EpisodeMetaData> propertySeasonOrder,EpisodeFile myEpisode)
         {
             //get our episode number based on the offset
             int episodeNumber = myEpisode.GetNewEpisodeNumber();
@@ -71,7 +71,7 @@ namespace AmericanDadEpisodeFixerForPlex
             return false;
         }
 
-        private List<EpisodeFile> HandleOverFlow(Dictionary<int, Episode> propertySeasonOrder, List<EpisodeFile> overFlow,int lastEpisode,ref int startOffSet)
+        private List<EpisodeFile> HandleOverFlow(Dictionary<int, EpisodeMetaData> propertySeasonOrder, List<EpisodeFile> overFlow,int lastEpisode,ref int startOffSet)
         {
             List<EpisodeFile> newOverFlow = new List<EpisodeFile>();
             foreach (EpisodeFile ef in overFlow)//go though our overflow episodes
@@ -92,10 +92,10 @@ namespace AmericanDadEpisodeFixerForPlex
             return newOverFlow;
         }
 
-        public void SortEpisodesBasedonMetaData(EpisodeMetaData emd)
+        public void SortEpisodesBasedonMetaData(EpisodeMetaDataHandler emd)
         {
             //We will get the proper order of the show
-            Dictionary<int, Dictionary<int, Episode>> properOrder  = emd.GetEpisodesForEachSeason();
+            Dictionary<int, Dictionary<int, EpisodeMetaData>> properOrder  = emd.GetEpisodesForEachSeason();
             
             //we will get our order
             Dictionary<int, List<EpisodeFile>> myOrder = this.GetEpisodesForEachSeason();
@@ -134,7 +134,7 @@ namespace AmericanDadEpisodeFixerForPlex
                 }
                 
                 //grab the proper order of the episodes
-                Dictionary<int, Episode> propertySeasonOrder = properOrder[i];
+                Dictionary<int, EpisodeMetaData> propertySeasonOrder = properOrder[i];
 
                 //will find out what is the last episode
                 currentSeasonLastEpisode = propertySeasonOrder.Max(x => x.Key);
@@ -168,7 +168,7 @@ namespace AmericanDadEpisodeFixerForPlex
                 if (propertySeasonOrder.Any())
                 {
                     Console.Write("Could Not Find Episodes: ");
-                    foreach(Episode episode in propertySeasonOrder.Values)
+                    foreach(EpisodeMetaData episode in propertySeasonOrder.Values)
                     {
                         Console.Write(episode.CombinedEpisodeAndSeason());
                         Console.Write(" ");

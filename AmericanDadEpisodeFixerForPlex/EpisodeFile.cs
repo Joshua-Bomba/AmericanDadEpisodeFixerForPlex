@@ -32,7 +32,7 @@ namespace AmericanDadEpisodeFixerForPlex
         [JsonIgnore]
         public FileInfo FileInfo { get; set; }
 
-        public Episode AssociatedEpisode { get; set; }
+        public EpisodeMetaData AssociatedEpisode { get; set; }
         [JsonIgnore]
         public int OverFlowOffSet { get; set; } = 0;
 
