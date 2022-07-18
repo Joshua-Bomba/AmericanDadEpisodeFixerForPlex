@@ -15,7 +15,8 @@ await using (EpisodeMetaData epfix = new EpisodeMetaData
 {
     EpisodeDataEndpoint = config["EpisodeList"],
     CachePage = config["CachePage"],
-    CachedEpisodes = config["CachedEpisodes"]
+    CachedEpisodes = config["CachedEpisodes"],
+    LogOutputFile = config["LogOutputFile"]
 })
 {
     ValueTask<bool> processedSucessfully = epfix.ProcessEpisodeData();

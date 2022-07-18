@@ -3,5 +3,6 @@
   "CachePage": "cachedpage.html",
   "CachedEpisodes": "cachedepisodes.json",
   "SeriesFolder": null,
-  "IncludedExtensions": [ "MP4", "MOV", "WMV", "AVI", "MKV" ]
+  "IncludedExtensions": [ "MP4", "MOV", "WMV", "AVI", "MKV" ],
+  "LogOutputFile":  "processedresult.json"
 }
