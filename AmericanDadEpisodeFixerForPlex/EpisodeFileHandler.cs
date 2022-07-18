@@ -165,22 +165,19 @@ namespace AmericanDadEpisodeFixerForPlex
                     }
                 }
 
-                if (propertySeasonOrder.Any())
-                {
-                    Console.Write("Could Not Find Episodes: ");
-                    foreach(EpisodeMetaData episode in propertySeasonOrder.Values)
-                    {
-                        Console.Write(episode.CombinedEpisodeAndSeason());
-                        Console.Write(" ");
-                    }
-                    Console.WriteLine();
-                }
-            }
-            Dictionary<string, EpisodeFile> orderAssociations = episodes
-                .GroupBy(x => x.AssociatedEpisode.Season).OrderBy(x => x.Key).SelectMany(x=>x.OrderBy(y=>y.AssociatedEpisode.EpisodeNumber))
-                .ToDictionary(x => x.AssociatedEpisode.CombinedEpisodeAndSeason(), y => y);
+                //if (propertySeasonOrder.Any())
+                //{
+                //    Console.Write("Could Not Find Episodes: ");
+                //    foreach(EpisodeMetaData episode in propertySeasonOrder.Values)
+                //    {
+                //        Console.Write(episode.CombinedEpisodeAndSeason());
+                //        Console.Write(" ");
+                //    }
+                //    Console.WriteLine();
+                //}
+            }                
 
-            emd.OutputLogFile(orderAssociations);
+            emd.OutputLogFile(episodes.GetOrderedEpisode());
         }
     }
 }

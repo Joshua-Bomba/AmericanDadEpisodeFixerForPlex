@@ -22,5 +22,12 @@ namespace AmericanDadEpisodeFixerForPlex
                     return false;
             return true;
         }
+
+
+        public Dictionary<string,EpisodeFile> GetOrderedEpisode()
+        {
+            return this.GroupBy(x => x.AssociatedEpisode.Season).OrderBy(x => x.Key).SelectMany(x => x.OrderBy(y => y.AssociatedEpisode.EpisodeNumber))
+                .ToDictionary(x => x.AssociatedEpisode.CombinedEpisodeAndSeason(), y => y);
+        }
     }
 }
