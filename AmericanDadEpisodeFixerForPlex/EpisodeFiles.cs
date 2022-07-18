@@ -23,9 +23,25 @@ namespace AmericanDadEpisodeFixerForPlex
             return true;
         }
 
-        public void CalculateMoves()
+        public void CalculateMoves(string? newFolder)
         {
-            string name = _dir.FullName;
+            string name;
+            if(newFolder != null)
+            {
+                if (Path.IsPathRooted(newFolder))
+                {
+                    name = newFolder;
+                }
+                else
+                {
+                    name = Path.Combine(_dir.FullName, newFolder);
+                }
+            }
+            else
+            {
+                name = _dir.FullName;
+            }
+
             foreach (EpisodeFile episode in this)
                 episode.CalculateMove(name);
         }

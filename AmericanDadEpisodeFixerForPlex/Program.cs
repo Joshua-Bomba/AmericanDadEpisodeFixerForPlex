@@ -27,7 +27,8 @@ if(bool.Parse(config["GenerateMoveInstructions:Enabled"]))
         EpisodeFileHandler efr = new EpisodeFileHandler
         {
             SeriesFolder = config["GenerateMoveInstructions:SeriesFolder"],
-            IncludedExtensions = extensions
+            IncludedExtensions = extensions,
+            OutputFolder = config["GenerateMoveInstructions:OutputFolder"]
         };
         if (await efr.PullFilesAndNames())
         {
@@ -37,7 +38,7 @@ if(bool.Parse(config["GenerateMoveInstructions:Enabled"]))
                 Console.WriteLine("Beging to Sort Base on Provide MetaData");
                 efr.SortEpisodesBasedonMetaData(epfix);
                 Console.WriteLine("Episodes Sorted Base on Provide MetaData");
-                efr.Episodes.CalculateMoves();
+                efr.SetOutputPaths();
                 Console.WriteLine("Calculating Moves");
                 epfix.OutputEpisodeChangeFile(efr.Episodes);
                 Console.WriteLine("Exporting output File");

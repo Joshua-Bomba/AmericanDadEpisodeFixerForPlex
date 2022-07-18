@@ -23,6 +23,13 @@ namespace AmericanDadEpisodeFixerForPlex
 
         public HashSet<string> IncludedExtensions { get; init; }
 
+        public string? OutputFolder { get; init; }
+
+
+        public void SetOutputPaths()
+        {
+            Episodes.CalculateMoves(OutputFolder);
+        }
 
 
         private void GetAllFiles(DirectoryInfo di, EpisodeFiles episodes)
