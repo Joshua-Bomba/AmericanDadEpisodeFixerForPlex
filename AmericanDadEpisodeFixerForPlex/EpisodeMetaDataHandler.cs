@@ -157,7 +157,7 @@ namespace AmericanDadEpisodeFixerForPlex
         }
 
         
-        public void OutputLogFile(Dictionary<string, EpisodeFile> assocications)
+        public void OutputEpisodeChangeFile(EpisodeFiles files)
         {
             if(LogOutputFile != null)
             {
@@ -165,7 +165,7 @@ namespace AmericanDadEpisodeFixerForPlex
                     _beforeFinish = new Stack<Task>();
                 _beforeFinish.Push(Task.Run(async () =>
                 {
-                    string res = JsonConvert.SerializeObject(assocications, new JsonSerializerSettings { Formatting = Newtonsoft.Json.Formatting.Indented });
+                    string res = JsonConvert.SerializeObject(files.GetOrderedEpisode(), new JsonSerializerSettings { Formatting = Newtonsoft.Json.Formatting.Indented });
                     await File.WriteAllTextAsync(LogOutputFile, res);
                 }));
             }

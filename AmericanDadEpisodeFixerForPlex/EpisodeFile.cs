@@ -16,10 +16,19 @@ namespace AmericanDadEpisodeFixerForPlex
         public FileInfo FileInfo { get; set; }
 
         public EpisodeMetaData AssociatedEpisode { get; set; }
+
+
+
+        public string OriginalFile => FileInfo.FullName;
+
+        public string? NewFile { get; set; }
+
+
         [JsonIgnore]
         public int OverFlowOffSet { get; set; } = 0;
 
         public int GetNewEpisodeNumber() => EpisodeNumber.Value - OverFlowOffSet;
+
 
         private bool ProcessSeasonAndEpisode(string season, string episode)
         {
@@ -74,6 +83,12 @@ namespace AmericanDadEpisodeFixerForPlex
                 return false;
             }
             return valid;
+        }
+
+        public void CalculateMove(string dir)
+        {
+            string fName = string.Format("S{0:00}E{1:00} - {2}.{3}", AssociatedEpisode.Season.Value, AssociatedEpisode.EpisodeNumber, AssociatedEpisode.EpisodeName, FileInfo.Extension);
+            this.NewFile = Path.Combine(dir, $"Season {AssociatedEpisode.Season.Value}",fName);
         }
 
     }

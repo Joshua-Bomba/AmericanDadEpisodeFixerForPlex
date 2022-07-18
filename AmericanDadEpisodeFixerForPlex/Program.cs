@@ -34,6 +34,8 @@ await using (EpisodeMetaDataHandler epfix = new EpisodeMetaDataHandler
         if (await processedSucessfully)
         {
             efr.SortEpisodesBasedonMetaData(epfix);
+            efr.Episodes.CalculateMoves();
+            epfix.OutputEpisodeChangeFile(efr.Episodes);
         }
         else
         {

@@ -10,13 +10,15 @@ namespace AmericanDadEpisodeFixerForPlex
 
     public class EpisodeFileHandler
     {
-        private EpisodeFiles episodes;
+
         public EpisodeFileHandler() 
         {
         
         }
 
         public string SeriesFolder { get; init; }
+
+        public EpisodeFiles Episodes { get; set; }
 
 
         public HashSet<string> IncludedExtensions { get; init; }
@@ -44,9 +46,9 @@ namespace AmericanDadEpisodeFixerForPlex
                 DirectoryInfo di = new DirectoryInfo(SeriesFolder);
                 if(di.Exists)
                 {
-                    episodes = new EpisodeFiles(di);
-                    GetAllFiles(di, episodes);
-                    return episodes.ProcessEpisodes();
+                    Episodes = new EpisodeFiles(di);
+                    GetAllFiles(di, Episodes);
+                    return Episodes.EstimateEpisodes();
                 }
             }
             return false;
@@ -55,7 +57,7 @@ namespace AmericanDadEpisodeFixerForPlex
 
         private Dictionary<int,List<EpisodeFile>> GetEpisodesForEachSeason()
         {
-            return episodes.GroupBy(x => x.Season.Value).ToDictionary(x => x.Key, y => y.ToList());
+            return Episodes.GroupBy(x => x.Season.Value).ToDictionary(x => x.Key, y => y.ToList());
         }
 
         private bool AssociateEpisode(Dictionary<int, EpisodeMetaData> propertySeasonOrder,EpisodeFile myEpisode)
@@ -164,20 +166,7 @@ namespace AmericanDadEpisodeFixerForPlex
                         nextSeasonFlowOver.Add(episode);
                     }
                 }
-
-                //if (propertySeasonOrder.Any())
-                //{
-                //    Console.Write("Could Not Find Episodes: ");
-                //    foreach(EpisodeMetaData episode in propertySeasonOrder.Values)
-                //    {
-                //        Console.Write(episode.CombinedEpisodeAndSeason());
-                //        Console.Write(" ");
-                //    }
-                //    Console.WriteLine();
-                //}
             }                
-
-            emd.OutputLogFile(episodes.GetOrderedEpisode());
         }
     }
 }

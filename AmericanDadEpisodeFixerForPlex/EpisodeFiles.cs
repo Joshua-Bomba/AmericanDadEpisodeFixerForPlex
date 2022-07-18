@@ -14,13 +14,20 @@ namespace AmericanDadEpisodeFixerForPlex
             _dir = dir;
         }
 
-        public bool ProcessEpisodes()
+        public bool EstimateEpisodes()
         {
             string dir = _dir.FullName;
             foreach (EpisodeFile episode in this)
                 if (!episode.EstimateEpisode(dir))
                     return false;
             return true;
+        }
+
+        public void CalculateMoves()
+        {
+            string name = _dir.FullName;
+            foreach (EpisodeFile episode in this)
+                episode.CalculateMove(name);
         }
 
 
