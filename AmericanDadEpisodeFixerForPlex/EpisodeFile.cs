@@ -33,6 +33,9 @@ namespace AmericanDadEpisodeFixerForPlex
 
         public Episode AssociatedEpisode { get; set; }
 
+        public int OverFlowOffSet { get; set; } = 0;
+
+        public int GetNewEpisodeNumber() => EpisodeNumber.Value - OverFlowOffSet;
 
         private bool ProcessSeasonAndEpisode(string season, string episode)
         {
