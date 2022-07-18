@@ -10,6 +10,10 @@ namespace AmericanDadEpisodeFixerForPlex
 {
     public class EpisodeFile : BaseEpisode
     {
+        public static readonly string INVALID_FILE_CHAR = new string(Path.GetInvalidFileNameChars().Concat(Path.GetInvalidPathChars()).ToHashSet().ToArray());
+        public static readonly Regex BAD_FILE_CHECK = new Regex($"[{ Regex.Escape(INVALID_FILE_CHAR)}]");
+
+
         public const string FIND_SEASON = "(?<=(s(eason)? ?))\\d{1,2}";
         public const string FIND_EPISODE = "(?<=(e(pisode)? ?))\\d{1,2}";
         [JsonIgnore]
@@ -86,7 +90,8 @@ namespace AmericanDadEpisodeFixerForPlex
 
         public void CalculateMove(string dir)
         {
-            string fName = string.Format("S{0:00}E{1:00} - {2}{3}", AssociatedEpisode.Season.Value, AssociatedEpisode.EpisodeNumber, AssociatedEpisode.EpisodeName, FileInfo.Extension);
+            string epName = BAD_FILE_CHECK.Replace(AssociatedEpisode.EpisodeName, "");
+            string fName = string.Format("S{0:00}E{1:00} - {2}{3}", AssociatedEpisode.Season.Value, AssociatedEpisode.EpisodeNumber, epName, FileInfo.Extension);
             this.NewFile = Path.Combine(dir, $"Season {AssociatedEpisode.Season.Value}",fName);
         }
 
