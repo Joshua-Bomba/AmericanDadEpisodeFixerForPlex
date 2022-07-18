@@ -14,6 +14,10 @@
     "SeriesFolder": null,
     "IncludedExtensions": [ "MP4", "MOV", "WMV", "AVI", "MKV" ],
     "OutputFile": "moveinstructions.json"
-  }
-  
+  },
+  "PerformMove": {
+    "Enabled": false,
+    "ConfigFile": "moveinstructions.json",
+    "RevertMode":  false
+  }  
 }
