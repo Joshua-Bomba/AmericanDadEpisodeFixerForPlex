@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,11 +29,11 @@ namespace AmericanDadEpisodeFixerForPlex
     {
         public const string FIND_SEASON = "(?<=(s(eason)? ?))\\d{1,2}";
         public const string FIND_EPISODE = "(?<=(e(pisode)? ?))\\d{1,2}";
-
+        [JsonIgnore]
         public FileInfo FileInfo { get; set; }
 
         public Episode AssociatedEpisode { get; set; }
-
+        [JsonIgnore]
         public int OverFlowOffSet { get; set; } = 0;
 
         public int GetNewEpisodeNumber() => EpisodeNumber.Value - OverFlowOffSet;

@@ -176,21 +176,11 @@ namespace AmericanDadEpisodeFixerForPlex
                     Console.WriteLine();
                 }
             }
+            Dictionary<string, EpisodeFile> orderAssociations = episodes
+                .GroupBy(x => x.AssociatedEpisode.Season).OrderBy(x => x.Key).SelectMany(x=>x.OrderBy(y=>y.AssociatedEpisode.EpisodeNumber))
+                .ToDictionary(x => x.AssociatedEpisode.CombinedEpisodeAndSeason(), y => y);
 
-            foreach(var kv in myOrder)
-            {
-                Console.WriteLine($"Processed Season {kv.Key}");
-                foreach(var l in kv.Value)
-                {
-                    if(l != null)
-                    {
-                        Console.WriteLine($"My Episode: {l.CombinedEpisodeAndSeason()} There Episode: {l.AssociatedEpisode.CombinedEpisodeAndSeason()}");
-                    }
-                }
-            }
-
-
-
+            emd.OutputLogFile(orderAssociations);
         }
     }
 }
