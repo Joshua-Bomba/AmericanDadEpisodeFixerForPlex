@@ -17,9 +17,8 @@ namespace AmericanDadEpisodeFixerForPlex
 
         public EpisodeMetaData AssociatedEpisode { get; set; }
 
-
-
-        public string OriginalFile => FileInfo.FullName;
+        private string? _originalFile; 
+        public string OriginalFile { get => _originalFile ??= FileInfo.FullName; set => _originalFile = value; }
 
         public string? NewFile { get; set; }
 
