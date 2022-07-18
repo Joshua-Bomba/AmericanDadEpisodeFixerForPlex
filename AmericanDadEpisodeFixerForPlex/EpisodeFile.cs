@@ -8,23 +8,6 @@ using System.Threading.Tasks;
 
 namespace AmericanDadEpisodeFixerForPlex
 {
-    public class Episodes : List<EpisodeFile>
-    {
-        private DirectoryInfo _dir;
-        public Episodes(DirectoryInfo dir)
-        {
-            _dir = dir;
-        }
-
-        public bool ProcessEpisodes()
-        {
-            string dir = _dir.FullName;
-            foreach (EpisodeFile episode in this)
-                if (!episode.EstimateEpisode(dir))
-                    return false;
-            return true;
-        }
-    }
     public class EpisodeFile : BaseEpisode
     {
         public const string FIND_SEASON = "(?<=(s(eason)? ?))\\d{1,2}";

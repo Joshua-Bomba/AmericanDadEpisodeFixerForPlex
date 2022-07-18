@@ -10,7 +10,7 @@ namespace AmericanDadEpisodeFixerForPlex
 
     public class EpisodeFileHandler
     {
-        private Episodes episodes;
+        private EpisodeFiles episodes;
         public EpisodeFileHandler() 
         {
         
@@ -23,7 +23,7 @@ namespace AmericanDadEpisodeFixerForPlex
 
 
 
-        private void GetAllFiles(DirectoryInfo di, Episodes episodes)
+        private void GetAllFiles(DirectoryInfo di, EpisodeFiles episodes)
         {
             foreach (FileInfo file in di.GetFiles())
                 if(IncludedExtensions.Contains(file.Extension.TrimStart('.').ToUpper()))
@@ -44,7 +44,7 @@ namespace AmericanDadEpisodeFixerForPlex
                 DirectoryInfo di = new DirectoryInfo(SeriesFolder);
                 if(di.Exists)
                 {
-                    episodes = new Episodes(di);
+                    episodes = new EpisodeFiles(di);
                     GetAllFiles(di, episodes);
                     return episodes.ProcessEpisodes();
                 }
