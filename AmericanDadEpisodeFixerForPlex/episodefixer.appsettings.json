@@ -18,6 +18,7 @@
   "PerformMove": {
     "Enabled": false,
     "ConfigFile": "moveinstructions.json",
-    "RevertMode":  false
+    "FailureLog": "failureLog.txt",
+    "RevertMode": false
   }  
 }

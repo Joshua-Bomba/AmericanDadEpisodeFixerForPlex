@@ -61,9 +61,11 @@ if (bool.Parse(config["PerformMove:Enabled"]))
     EpisodeMover em = new EpisodeMover
     {
         ConfigFile = config["PerformMove:ConfigFile"],
-        RevertMode = bool.Parse(config["PerformMove:RevertMode"])
+        RevertMode = bool.Parse(config["PerformMove:RevertMode"]),
+        FailureLog = config["PerformMove:FailureLog"]
     };
     await em.LoadInFile();
+    em.PerformMoves();
 
 }
 
