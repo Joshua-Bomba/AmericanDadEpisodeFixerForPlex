@@ -1,15 +1,19 @@
 {
-  "EpisodeList": "https://en.wikipedia.org/wiki/List_of_American_Dad!_episodes",
-  "MetaDataRegex": {
-    "FindTableRegex":  null
-  },
-  "FileRegex": {
-    "FindSeasonRegex": null,
-    "FindEpisodeRegex": null
-  },
-  "CachePage": "cachedpage.html",
-  "CachedEpisodes": "cachedepisodes.json",
-  "SeriesFolder": null,
-  "IncludedExtensions": [ "MP4", "MOV", "WMV", "AVI", "MKV" ],
-  "LogOutputFile": "moveinstructions.json",
+  "GenerateMoveInstructions": {
+    "Enabled": false,
+    "EpisodeList": "https://en.wikipedia.org/wiki/List_of_American_Dad!_episodes",
+    "MetaDataRegex": {
+      "FindTableRegex": null
+    },
+    "FileRegex": {
+      "FindSeasonRegex": null,
+      "FindEpisodeRegex": null
+    },
+    "CachePage": "cachedpage.html",
+    "CachedEpisodes": "cachedepisodes.json",
+    "SeriesFolder": null,
+    "IncludedExtensions": [ "MP4", "MOV", "WMV", "AVI", "MKV" ],
+    "OutputFile": "moveinstructions.json"
   }
+  
+}

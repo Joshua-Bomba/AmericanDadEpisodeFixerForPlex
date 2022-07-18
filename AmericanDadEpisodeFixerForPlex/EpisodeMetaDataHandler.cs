@@ -30,7 +30,7 @@ namespace AmericanDadEpisodeFixerForPlex
 
         public string? CachedEpisodes { get; init; }
 
-        public string? LogOutputFile { get; init; }
+        public string? OutputFile { get; init; }
 
         private async ValueTask<string?> GetPageData()
         {
@@ -159,14 +159,14 @@ namespace AmericanDadEpisodeFixerForPlex
         
         public void OutputEpisodeChangeFile(EpisodeFiles files)
         {
-            if(LogOutputFile != null)
+            if(OutputFile != null)
             {
                 if (_beforeFinish == null)
                     _beforeFinish = new Stack<Task>();
                 _beforeFinish.Push(Task.Run(async () =>
                 {
                     string res = JsonConvert.SerializeObject(files.GetOrderedEpisode(), new JsonSerializerSettings { Formatting = Newtonsoft.Json.Formatting.Indented });
-                    await File.WriteAllTextAsync(LogOutputFile, res);
+                    await File.WriteAllTextAsync(OutputFile, res);
                 }));
             }
         }

@@ -10,43 +10,48 @@ IConfiguration config = builder.Build();
 
 
 
-
-await using (EpisodeMetaDataHandler epfix = new EpisodeMetaDataHandler
+if(bool.Parse(config["GenerateMoveInstructions:Enabled"]))
 {
-    EpisodeDataEndpoint = config["EpisodeList"],
-    CachePage = config["CachePage"],
-    CachedEpisodes = config["CachedEpisodes"],
-    LogOutputFile = config["LogOutputFile"]
-})
-{
-    ValueTask<bool> processedSucessfully = epfix.ProcessEpisodeData();
 
-    var extensions = config.GetSection("IncludedExtensions").GetChildren().Select(x => x.Value).ToHashSet();
+    await using (EpisodeMetaDataHandler epfix = new EpisodeMetaDataHandler
+    {
+        EpisodeDataEndpoint = config["GenerateMoveInstructions:EpisodeList"],
+        CachePage = config["GenerateMoveInstructions:CachePage"],
+        CachedEpisodes = config["GenerateMoveInstructions:CachedEpisodes"],
+        OutputFile = config["GenerateMoveInstructions:OutputFile"]
+    })
+    {
+        ValueTask<bool> processedSucessfully = epfix.ProcessEpisodeData();
 
-    EpisodeFileHandler efr = new EpisodeFileHandler
-    {
-        SeriesFolder = config["SeriesFolder"],
-        IncludedExtensions = extensions
-    };
-    if(await efr.PullFilesAndNames())
-    {
-        Console.WriteLine($"Got Episodes from {efr.SeriesFolder}");
-        if (await processedSucessfully)
+        var extensions = config.GetSection("GenerateMoveInstructions:IncludedExtensions").GetChildren().Select(x => x.Value).ToHashSet();
+
+        EpisodeFileHandler efr = new EpisodeFileHandler
         {
-            efr.SortEpisodesBasedonMetaData(epfix);
-            efr.Episodes.CalculateMoves();
-            epfix.OutputEpisodeChangeFile(efr.Episodes);
+            SeriesFolder = config["GenerateMoveInstructions:SeriesFolder"],
+            IncludedExtensions = extensions
+        };
+        if (await efr.PullFilesAndNames())
+        {
+            Console.WriteLine($"Got Episodes from {efr.SeriesFolder}");
+            if (await processedSucessfully)
+            {
+                efr.SortEpisodesBasedonMetaData(epfix);
+                efr.Episodes.CalculateMoves();
+                epfix.OutputEpisodeChangeFile(efr.Episodes);
+            }
+            else
+            {
+                Console.WriteLine("Could not process episode metadata");
+            }
         }
         else
         {
-            Console.WriteLine("Could not process episode metadata");
+            Console.WriteLine($"Couple Not Process all the episodes from {efr.SeriesFolder}");
         }
+
     }
-    else
-    {
-        Console.WriteLine($"Couple Not Process all the episodes from {efr.SeriesFolder}");
-    }
-    
 }
+
+
 
 
